@@ -1,19 +1,7 @@
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma";
+import { prisma } from "../db/prisma";
 import { sendOTPEmail } from "../utils/sendOTP";
 import { SignupInput, VerifyOTPInput, AuthResponse } from "../interfaces/auth.interface";
-
-dotenv.config();
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -29,7 +17,7 @@ export const signupService = async (data: SignupInput): Promise<AuthResponse> =>
   if (existingUser) {
     return {
       success: false,
-      message: "We couldn’t create your account.Try signing in if you already have an account.",
+      message: "Invalid credentials.",
     };
   }
 

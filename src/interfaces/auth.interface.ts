@@ -1,3 +1,17 @@
+export interface BaseResponse {
+    success: boolean;
+    message: string;
+}
+
+export interface AuthResponse extends BaseResponse {
+    data?: {
+        id: number;
+        name: string;
+        email: string;
+        createdAt: Date;
+    };
+}
+
 export interface SignupInput {
     name: string;
     email: string;
@@ -9,13 +23,3 @@ export interface VerifyOTPInput {
     otp: string;
 }
 
-export interface AuthResponse {
-    success: boolean;
-    message: string;
-    data?: {
-        id: number;
-        name: string;
-        email: string;
-        createdAt: Date;
-    };
-}
