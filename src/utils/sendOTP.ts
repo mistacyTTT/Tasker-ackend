@@ -1,31 +1,31 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { ENV } from "../config/env";
 
-const resend = new Resend(ENV.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: ENV.SMTP_HOST,
+  port: ENV.SMTP_PORT,
+  secure: false,
+  auth: {
+    user: ENV.SMTP_USER,
+    pass: ENV.SMTP_PASS,
+  },
+});
 
 export const sendOTPEmail = async (email: string, otp: string): Promise<void> => {
-  try {
-    console.log("Sending OTP email to:", email);
-    
-    const result = await resend.emails.send({
-      from: "Tasker <onboarding@resend.dev>",
-      to: email,
-      subject: "Verify your Tasker account",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto;">
-          <h2>Verify your email</h2>
-          <p>Thanks for signing up to Tasker! Use the OTP below to verify your account.</p>
-          <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 24px 0;">
-            ${otp}
-          </div>
-          <p>This code expires in <strong>10 minutes</strong>.</p>
-          <p>If you didn't sign up for Tasker, ignore this email.</p>
+  await transporter.sendMail({
+    from: `"Tasker" <${ENV.SMTP_USER}>`,
+    to: email,
+    subject: "Verify your Tasker account",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto;">
+        <h2>Verify your email</h2>
+        <p>Thanks for signing up to Tasker! Use the OTP below to verify your account.</p>
+        <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 24px 0;">
+          ${otp}
         </div>
-      `,
-    });
-
-   console.log("Resend result:", result);
-  } catch (error) {
-    console.error("Error sending email:", error);
-  }
+        <p>This code expires in <strong>10 minutes</strong>.</p>
+        <p>If you didn't sign up for Tasker, ignore this email.</p>
+      </div>
+    `,
+  });
 };

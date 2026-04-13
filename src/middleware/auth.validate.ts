@@ -12,9 +12,13 @@ const verifyOTPSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits."),
 });
 
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
 export const validateSignup = (req: Request, res: Response, next: NextFunction): void => {
   const result = signupSchema.safeParse(req.body);
-
   if (!result.success) {
     res.status(400).json({
       success: false,
@@ -22,13 +26,11 @@ export const validateSignup = (req: Request, res: Response, next: NextFunction):
     });
     return;
   }
-
   next();
 };
 
 export const validateVerifyOTP = (req: Request, res: Response, next: NextFunction): void => {
   const result = verifyOTPSchema.safeParse(req.body);
-
   if (!result.success) {
     res.status(400).json({
       success: false,
@@ -36,6 +38,17 @@ export const validateVerifyOTP = (req: Request, res: Response, next: NextFunctio
     });
     return;
   }
+  next();
+};
 
+export const validateLogin = (req: Request, res: Response, next: NextFunction): void => {
+  const result = loginSchema.safeParse(req.body);
+  if (!result.success) {
+    res.status(400).json({
+      success: false,
+      message: result.error.issues[0].message,
+    });
+    return;
+  }
   next();
 };

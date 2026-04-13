@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { prisma } from "../db/prisma";
 import { sendOTPEmail } from "../utils/sendOTP";
-import { SignupInput, VerifyOTPInput, AuthResponse } from "../interfaces/auth.interface";
+import { SignupInput, VerifyOTPInput, AuthResponse, LoginInput, LoginResponse } from "../interfaces/auth.interface";
+import { ENV } from "../config/env";
 
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -90,5 +92,46 @@ export const verifyOTPService = async (data: VerifyOTPInput): Promise<AuthRespon
   return {
     success: true,
     message: "Email verified successfully! You can now log in.",
+  };
+};
+
+export const loginService = async (data: LoginInput): Promise<LoginResponse> => {
+  const { email, password } = data;
+
+  // Check if user exists
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Invalid credentials.",
+    };
+  }
+
+  
+
+  // Compare password
+  const passwordMatch = await bcrypt.compare(password, user.password);
+
+  if (!passwordMatch) {
+    return {
+      success: false,
+      message: "Invalid credentials.",
+    };
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    ENV.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  return {
+    success: true,
+    message: "Login successful!",
+    token,
   };
 };

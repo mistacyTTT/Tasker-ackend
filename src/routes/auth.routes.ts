@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { validateSignup, validateVerifyOTP } from "../middleware/auth.validate";
-import { signup, verifyOTP } from "../controllers/auth.controller";
+import { signup, verifyOTP, login } from "../controllers/auth.controller";
+import { validateSignup, validateVerifyOTP, validateLogin } from "../middleware/auth.validate";
 
 const router = Router();
 
 router.post("/signup", validateSignup, signup);
 router.post("/verify-otp", validateVerifyOTP, verifyOTP);
+router.post("/login", validateLogin, login);
 
-export default router; 
+export default router;
