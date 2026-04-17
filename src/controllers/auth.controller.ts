@@ -63,4 +63,12 @@ export const logout = (req: Request, res: Response) => {
     path: "/",
   });
   return res.status(200).json({ message: "Logged out successfully" });
+    res.status(status).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
 };
