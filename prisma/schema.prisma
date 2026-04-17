@@ -16,5 +16,22 @@ model User {
   isVerified Boolean  @default(false)
   otp        String?
   otpExpiry  DateTime?
-  createdAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  tasks      Task[]
+}
+
+model Task {
+  id           Int      @id @default (autoincrement())
+  title        String
+  description  String?
+  day          String?
+  priority     String?
+  tags         String[]
+  assignee     String?
+  notify       String?
+  done         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
 }
